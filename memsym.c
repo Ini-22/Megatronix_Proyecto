@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+//Iñigo Catalina
+//Victor Benito
 
 #define TAM_LINEA 16
 #define NUM_FILAS 8
