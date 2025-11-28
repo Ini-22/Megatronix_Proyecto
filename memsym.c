@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <unistd.h>
 
 #define TAM_LINEA 16
 #define NUM_FILAS 8
@@ -41,9 +41,26 @@ int main() {
         printf("Acceso a direccion: %04X\n", direccion);
         int ETQ, palabra, linea, bloque;
         ParsearDireccion(direccion, &ETQ, &palabra, &linea, &bloque);
-        printf("Parseo -> ETQ=%02X  linea=%d  palabra=%d  bloque=%d\n",
-               ETQ, linea, palabra, bloque);
+        printf("Parseo -> ETQ=%02X  linea=%d  palabra=%d  bloque=%d\n", ETQ, linea, palabra, bloque);
+        if (cache[linea].ETQ != ETQ) {
+            printf("---- FALLO DE CACHE----\n");
+            TratarFallo(cache, Simul_RAM, ETQ, linea, bloque);
+        } else {
+            printf("---- ACIERTO DE CACHE ----\n");
+        }
+        VolcarCACHE(cache);
+        sleep(1);
   }
+  fclose(fAcm);
+  printf("\nFIN. Fallos totales: %d\n", numfallos);
+  FILE *fCache = fopen("CONTENTS_CACHE.bin", "wb");
+  if (!fCache) {
+      printf("Fallo al abrir contents cache\n");
+      return -1;
+  }
+  fwrite(cache, sizeof(T_CACHE_LINE), NUM_FILAS, fCache);
+  fclose(fCache);
+  return 0;
 }
 
 void LimpiarCACHE(T_CACHE_LINE tbl[NUM_FILAS]) { //inicializar los campos de la cache
